@@ -14,11 +14,21 @@ import {
   Eye,
   RefreshCw,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 /* ---------------- CARD ---------------- */
-function StatCard({ title, value, icon: Icon, color }) {
+function StatCard({ title, value, icon: Icon, color, clickable, onClick  }) {
   return (
-    <div className="p-5 rounded-2xl shadow-sm border bg-white hover:shadow-md transition-all">
+    <div onClick={clickable ? onClick : undefined}  className={`
+        p-5 rounded-2xl shadow-sm border bg-white transition-all
+        ${
+          clickable
+            ? "cursor-pointer hover:shadow-md hover:-translate-y-1"
+            : "cursor-default"
+        }
+      `}
+    >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-500 text-sm">{title}</p>
@@ -40,7 +50,12 @@ function Home() {
   const [dashboard, setDashboard] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const canNavigate =
+  user?.details_view === 1 &&
+  user?.admin_type !== "user" &&
+  user?.user_type === 2;
   const loadDashboard = async () => {
     try {
       setIsFetching(true);
@@ -121,6 +136,8 @@ function Home() {
                 value={dashboard?.total_active}
                 icon={Users}
                 color="bg-green-500"
+                clickable={canNavigate}
+                onClick={() => navigate("/active-user")}
               />
 
               <StatCard
@@ -128,6 +145,8 @@ function Home() {
                 value={dashboard?.total_inactive}
                 icon={UserX}
                 color="bg-red-500"
+                clickable={canNavigate}
+                onClick={() => navigate("/inactive-user")}
               />
 
               <StatCard
@@ -135,6 +154,8 @@ function Home() {
                 value={dashboard?.total_amount}
                 icon={IndianRupee}
                 color="bg-purple-500"
+                clickable={canNavigate}
+                onClick={() => navigate("/lead")}
               />
 
               <StatCard
@@ -142,6 +163,8 @@ function Home() {
                 value={dashboard?.total_leads}
                 icon={TrendingUp}
                 color="bg-blue-500"
+                clickable={canNavigate}
+                onClick={() => navigate("/lead")}
               />
 
               <StatCard
@@ -149,6 +172,8 @@ function Home() {
                 value={dashboard?.total_meeting}
                 icon={Calendar}
                 color="bg-yellow-500"
+                clickable={canNavigate}
+                onClick={() => navigate("/inactive-meetings")}
               />
 
               <StatCard
@@ -156,6 +181,8 @@ function Home() {
                 value={dashboard?.total_onetoone}
                 icon={Handshake}
                 color="bg-indigo-500"
+                clickable={canNavigate}
+                onClick={() => navigate("/one-to-one")}
               />
 
               <StatCard
@@ -163,6 +190,8 @@ function Home() {
                 value={dashboard?.total_visitor}
                 icon={Eye}
                 color="bg-pink-500"
+                clickable={canNavigate}
+                onClick={() => navigate("/visitor-guest")}
               />
             </div>
           )}
