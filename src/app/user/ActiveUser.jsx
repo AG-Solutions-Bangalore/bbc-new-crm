@@ -321,10 +321,11 @@ const ActiveUser = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => handleUpdateGroupType(row.original)}
-                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8"
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 cursor-pointer"
                 >
                   <Edit2 className="h-4 w-4" />
                 </Button>
@@ -337,10 +338,11 @@ const ActiveUser = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => handleUpdateSubGroup(row.original)}
-                  className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 h-8 w-8"
+                  className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 h-8 w-8 cursor-pointer"
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -353,10 +355,11 @@ const ActiveUser = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => handleUpdateJoiningDetails(row.original)}
-                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8"
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 cursor-pointer"
                 >
                   <Edit3 className="h-4 w-4" />
                 </Button>
@@ -370,10 +373,11 @@ const ActiveUser = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
+                    type="button"
                     variant="ghost"
                     size="icon"
                     onClick={() => handleGoldClick(row.original.id)}
-                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 h-8 w-8"
+                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 h-8 w-8 cursor-pointer"
                   >
                     <Star className="h-4 w-4" />
                   </Button>
@@ -382,15 +386,16 @@ const ActiveUser = () => {
               </Tooltip>
             </TooltipProvider>
           )}
-<TooltipProvider>
+          <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate(`/user-edit?id=${row.original.id}`)}
-                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 h-8 w-8"
-                    >
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(`/user-edit?id=${row.original.id}`)}
+                  className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 h-8 w-8 cursor-pointer"
+                >
                   <PenTool className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
