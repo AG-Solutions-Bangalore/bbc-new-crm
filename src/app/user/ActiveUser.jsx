@@ -14,6 +14,10 @@ import {
   Eye,
   Loader2,
   LogOut,
+  PenIcon,
+  PenLine,
+  PenOff,
+  PenTool,
   RefreshCw,
   Star,
 } from "lucide-react";
@@ -387,7 +391,7 @@ const ActiveUser = () => {
                       onClick={() => navigate(`/user-edit?id=${row.original.id}`)}
                       className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 h-8 w-8"
                     >
-                  <Eye className="h-4 w-4" />
+                  <PenTool className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Profile Edit</TooltipContent>
