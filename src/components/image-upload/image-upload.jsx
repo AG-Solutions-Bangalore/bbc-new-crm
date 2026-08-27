@@ -83,8 +83,17 @@ const ImageUpload = ({
 
   return (
     <div className={`${className}`}>
+      <Input
+        id={id}
+        name={id}
+        type="file"
+        accept={accept}
+        onChange={handleFileValidation}
+        className="hidden"
+      />
+
       <label
-        className="text-sm font-medium flex items-center gap-2"
+        className="text-sm font-medium flex items-center gap-2 cursor-pointer mb-1"
         htmlFor={id}
       >
         <Camera size={18} />
@@ -94,17 +103,21 @@ const ImageUpload = ({
 
       {selectedFile || previewImage ? (
         <div className="relative group rounded-lg border border-gray-200 overflow-hidden bg-gray-50 hover:border-gray-300 transition-all">
-          <div className="w-full h-28 flex items-center justify-center bg-white">
+          <label htmlFor={id} className="w-full h-28 flex items-center justify-center bg-white cursor-pointer relative block">
             <img
               src={previewImage}
               alt="Preview"
               className="w-full h-full object-contain p-1"
             />
-          </div>
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-medium transition-opacity">
+              Click to change image
+            </div>
+          </label>
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-1.5 right-1.5 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-1.5 right-1.5 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Remove image"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -124,14 +137,6 @@ const ImageUpload = ({
           htmlFor={id}
           className="block border-2 border-dashed border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-accent hover:bg-blue-50/50 transition-all"
         >
-          <Input
-            id={id}
-            name={id}
-            type="file"
-            accept={accept}
-            onChange={handleFileValidation}
-            className="hidden"
-          />
           <div className="flex flex-col items-center gap-1.5">
             <Upload className="h-4 w-4 text-gray-400" />
             <p className="text-xs font-medium text-gray-700">Upload image</p>
@@ -143,11 +148,11 @@ const ImageUpload = ({
       )}
 
       {fileerror ? (
-        <p className="text-xs text-red-500 font-medium whitespace-pre-line">
+        <p className="text-xs text-red-500 font-medium whitespace-pre-line mt-1">
           {fileerror}
         </p>
       ) : (
-        <p className="text-xs text-red-500 font-medium whitespace-pre-line">
+        <p className="text-xs text-red-500 font-medium whitespace-pre-line mt-1">
           {error}
         </p>
       )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,21 @@ const Profile = () => {
 
   const { trigger: fetchProfile } = useApiMutation();
   const { trigger: updateProfile, loading } = useApiMutation();
+  const queryClient = useQueryClient();
+
+const formatDateForInput = (dateStr) => {
+  if (!dateStr) return "";
+  const str = String(dateStr).trim();
+  const ymdMatch = str.match(/^(\d{4})[-/](\d{2})[-/](\d{2})/);
+  if (ymdMatch) {
+    return `${ymdMatch[1]}-${ymdMatch[2]}-${ymdMatch[3]}`;
+  }
+  const dmyMatch = str.match(/^(\d{2})[-/](\d{2})[-/](\d{4})/);
+  if (dmyMatch) {
+    return `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
+  }
+  return str;
+};
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -78,25 +94,30 @@ const Profile = () => {
           url: PROFILE.profile,
           method: "get",
         });
-        if (res?.profile) {
+        const profileData = res?.profile || res?.user || res?.data || res?.new_user;
+        if (profileData) {
           const fetchedData = { ...initialState };
           Object.keys(initialState).forEach((key) => {
             if (key !== "image") {
               // Convert null/undefined to empty strings to match input values
               fetchedData[key] =
-                res.profile[key] !== null && res.profile[key] !== undefined
-                  ? String(res.profile[key])
+                profileData[key] !== null && profileData[key] !== undefined
+                  ? String(profileData[key])
                   : "";
             }
           });
 
-          setId(res.profile.id);
+          if (fetchedData.gender) fetchedData.gender = fetchedData.gender.toUpperCase();
+          if (fetchedData.dob) fetchedData.dob = formatDateForInput(fetchedData.dob);
+          if (fetchedData.doa) fetchedData.doa = formatDateForInput(fetchedData.doa);
+
+          setId(profileData.id);
           setInitialData(fetchedData);
           setFormData(fetchedData);
 
-          if (res.profile.image) {
+          if (profileData.image) {
             setPreview({
-              image: `https://businessboosters.club/public/images/user_images/${res.profile.image}`,
+              image: `https://businessboosters.club/public/images/user_images/${profileData.image}`,
             });
           }
         }
@@ -148,8 +169,8 @@ const Profile = () => {
     if (!formData.gender) newErrors.gender = "Gender is required";
     if (!formData.email) {
       newErrors.email = "Email is required";
-    } else if (!formData.email.endsWith(".com")) {
-      newErrors.email = "Email must end with .com";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
     }
     if (!formData.mobile) newErrors.mobile = "Mobile is required";
     if (!formData.whatsapp_number)
@@ -164,26 +185,42 @@ const Profile = () => {
       newErrors.product = "Products/Services details are required";
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    if (!isValid) {
+      const errorFields = Object.keys(newErrors).join(", ");
+      toast.error(`Please fill in required fields: ${errorFields}`);
+    }
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // Use FormData for image upload support like in the notification template
     const formDataObj = new FormData();
     Object.keys(formData).forEach((key) => {
-      // Don't append null values for files if no new file is selected
-      if (formData[key] !== null) {
+      if (key === "image") {
+        if (
+          formData.image &&
+          typeof formData.image === "object" &&
+          (formData.image instanceof File ||
+            formData.image instanceof Blob ||
+            formData.image.name)
+        ) {
+          formDataObj.append("image", formData.image);
+        }
+      } else if (formData[key] !== null && formData[key] !== undefined) {
         formDataObj.append(key, formData[key]);
       }
     });
     formDataObj.append("_method", "PUT");
 
     try {
+      const updateUrl = id
+        ? `${PROFILE.updateprofile}/${id}`
+        : PROFILE.updateprofile;
       const res = await updateProfile({
-        url: `${PROFILE.updateprofile}/${id}`, // your endpoint
+        url: updateUrl,
         method: "post",
         data: formDataObj,
         headers: {
@@ -191,14 +228,41 @@ const Profile = () => {
         },
       });
 
-      if (res?.code === 200 || res?.code === 201 || res?.status === "success") {
-        toast.success(res.message || "Profile Updated Successfully");
+      if (
+        res?.code === 200 ||
+        res?.code === 201 ||
+        res?.code === "200" ||
+        res?.status === "success" ||
+        res?.status === true ||
+        res?.success === true ||
+        res?.status === 200
+      ) {
+        toast.success(res?.message || res?.msg || "Profile Updated Successfully");
+        queryClient.invalidateQueries(["active-users"]);
+        queryClient.invalidateQueries(["active-members"]);
+        queryClient.invalidateQueries(["profile"]);
         setInitialData(formData);
       } else {
-        toast.error(res?.message || "Failed to update profile");
+        const msg = res?.message || res?.msg || res?.error || (typeof res === "string" ? res : "Failed to update profile");
+        toast.error(msg);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error updating profile");
+      console.error("Update profile error:", error);
+      const serverData = error?.response?.data;
+      let serverMsg = "Error updating profile";
+      if (serverData) {
+        if (serverData.message) serverMsg = serverData.message;
+        else if (serverData.msg) serverMsg = serverData.msg;
+        else if (serverData.error) serverMsg = serverData.error;
+        else if (serverData.errors && typeof serverData.errors === "object") {
+          serverMsg = Object.values(serverData.errors).flat().join(", ");
+        } else if (typeof serverData === "string") {
+          serverMsg = serverData;
+        }
+      } else if (error?.message) {
+        serverMsg = error.message;
+      }
+      toast.error(serverMsg);
     }
   };
 
@@ -223,7 +287,7 @@ const Profile = () => {
             autoComplete="off"
             className="space-y-8"
           >
-            <div className="grid grid-cols-3 mb-8 border-b border-gray-200 py-5">
+            <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-8 border-b border-gray-200 py-5">
               <div className="relative w-fit">
                 <ImageUpload
                   id="image"
@@ -239,15 +303,15 @@ const Profile = () => {
                   allowedExtensions={["webp", "jpg", "jpeg", "png"]}
                 />
               </div>
-              <div className="flex flex-col justify-center mx-auto">
-                <div className="text-2xl text-primary uppercase ">
+              <div className="flex flex-col justify-center text-center md:text-left">
+                <div className="text-2xl text-primary uppercase font-bold">
                   Profile Information
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Update your profile information
+                  Update profile information
                 </p>
               </div>
-              <div className="flex justify-end gap-5 items-center h-full ">
+              <div className="flex justify-end gap-3 items-center">
                 <Button
                   type="button"
                   variant="outline"
@@ -255,7 +319,7 @@ const Profile = () => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading || !hasChanges}>
+                <Button type="submit" disabled={loading} className="cursor-pointer">
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Update Profile
                 </Button>
@@ -556,6 +620,20 @@ const Profile = () => {
                   className={`h-20`}
                 />
               </div>
+            </div>
+
+            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 mt-8">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => window.history.back()}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading} size="lg" className="px-8 cursor-pointer">
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Update Profile
+              </Button>
             </div>
           </form>
         </CardContent>
