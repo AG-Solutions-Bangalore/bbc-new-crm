@@ -11,6 +11,7 @@ import {
   Edit2,
   Edit2Icon,
   Edit3,
+  Eye,
   Loader2,
   LogOut,
   RefreshCw,
@@ -52,6 +53,7 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 
 const ActiveUser = () => {
   const [openGoldDialog, setOpenGoldDialog] = useState(false);
@@ -71,7 +73,7 @@ const ActiveUser = () => {
   const [userIdForJoiningDetails, setUserIdForJoiningDetails] = useState(null);
   const [joiningDate, setJoiningDate] = useState("");
   const [whoJoinedId, setWhoJoinedId] = useState("");
-
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, refetch } = useGetApiMutation({
@@ -376,6 +378,22 @@ const ActiveUser = () => {
               </Tooltip>
             </TooltipProvider>
           )}
+<TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate(`/user-edit?id=${row.original.id}`)}
+                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 h-8 w-8"
+                    >
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Profile Edit</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+           
         </div>
       ),
     },
