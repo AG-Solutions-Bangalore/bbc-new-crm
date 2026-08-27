@@ -35,6 +35,7 @@ import BonusPoint from "@/app/bonus-point/BonusPoint";
 import AttendenceReport from "@/app/report/AttendenceReport";
 import Activity from "@/app/activity/Activity";
 import ActivityPrint from "@/app/report/ActivityPrint";
+import EditUser from "@/app/user/EditUser";
 
 function AppRoutes() {
   return (
@@ -196,6 +197,14 @@ function AppRoutes() {
             element={
               <Suspense fallback={<LoadingBar />}>
                 <NewUserView />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/user-edit"
+            element={
+              <Suspense fallback={<LoadingBar />}>
+                <EditUser />
               </Suspense>
             }
           />

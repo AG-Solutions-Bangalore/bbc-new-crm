@@ -116,6 +116,7 @@ export const USER_API = {
   inactive: "/panel-fetch-inactive-profile",
   mobile: "/panel-fetch-mobile-profile",
   byId: (id) => `/panel-fetch-profile-by-id/${id}`,
+  update: (id) => `/panel-update-profile/${id}`,
   delete: (id) => `/panel-delete-profile/${id}`,
   deleteMobile: (id) => `/panel-delete-contact/${id}`,
   activate: (id) => `/panel-update-new-profile/${id}`,
