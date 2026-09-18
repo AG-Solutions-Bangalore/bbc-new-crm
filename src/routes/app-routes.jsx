@@ -36,6 +36,7 @@ import AttendenceReport from "@/app/report/AttendenceReport";
 import Activity from "@/app/activity/Activity";
 import ActivityPrint from "@/app/report/ActivityPrint";
 import EditUser from "@/app/user/EditUser";
+import Notification from "@/app/notification/Notification";
 
 function AppRoutes() {
   return (
@@ -253,6 +254,14 @@ function AppRoutes() {
             element={
               <Suspense fallback={<LoadingBar />}>
                 <Download />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/notification"
+            element={
+              <Suspense fallback={<LoadingBar />}>
+                <Notification />
               </Suspense>
             }
           />
