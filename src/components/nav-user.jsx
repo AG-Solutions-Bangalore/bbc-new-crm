@@ -71,15 +71,14 @@ export function NavUser({ user }) {
             </DropdownMenuTrigger>
             <SidebarMenuButton
               size="lg"
-              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground p-0 cursor-text data-[state=open]: ${
-                sidebar ? "text-red-950" : "hidden"
-              }`}
+              className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground p-0 cursor-text data-[state=open]: ${sidebar ? "text-red-950" : "hidden"
+                }`}
             >
               <div className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground px-4 py-2 w-full  h-10 ">
                 <div className="flex justify-between items-center h-full w-full text-xs leading-tight text-center">
                   <span className="flex items-center gap-1 font-semibold"></span>
                   <span className="flex items-center gap-1 font-semibold">
-                    Updated on :27-08-2026
+                    Updated on :18-09-2026
                   </span>
                 </div>
               </div>

@@ -41,6 +41,7 @@ import {
   BarChart3,
   Award,
   Activity,
+  Bell,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FaUserClock } from "react-icons/fa";
@@ -196,6 +197,11 @@ const NAVIGATION_CONFIG = {
         },
       ],
     },
+    NOTIFICATION: {
+      title: "Notification",
+      url: "/notification",
+      icon: Bell,
+    },
     SETTINGS: {
       title: "Settings",
       url: "/settings",
@@ -260,6 +266,7 @@ const USER_ROLE_PERMISSIONS = {
       "CONTACT",
       "SHARE_USER",
       "REPORT",
+      "NOTIFICATION",
       "SETTINGS",
     ],
     navMainReport: [
@@ -277,6 +284,7 @@ const USER_ROLE_PERMISSIONS = {
       "CONTACT",
       "SHARE_USER",
       "REPORT",
+      "NOTIFICATION",
       "SETTINGS",
     ],
   },
@@ -368,6 +376,7 @@ const LIMITED_MASTER_SETTINGS = {
 const ADMIN_TYPE_MAP = {
   admin: 1,
   superadmin: 2,
+  supervisor: 2,
   user: 3,
   usertype1: 4,
 };
@@ -380,16 +389,39 @@ const useNavigationData = (user) => {
     if (user?.admin_type === "user") {
       userTypeKey = Number(user?.details_view) === 1 ? 4 : 3;
     } else {
-      userTypeKey = ADMIN_TYPE_MAP[user?.admin_type] || 1;
+      userTypeKey =
+        ADMIN_TYPE_MAP[user?.admin_type] ||
+        ADMIN_TYPE_MAP[user?.admintype] ||
+        (Number(user?.user_type) === 2 || Number(user?.usertype) === 2 ? 2 : 1);
     }
 
     const permissions =
       USER_ROLE_PERMISSIONS[userTypeKey] || USER_ROLE_PERMISSIONS[1];
 
+    const isSupervisor =
+      Number(user?.user_type) === 2 ||
+      Number(user?.usertype) === 2 ||
+      userTypeKey === 2 ||
+      user?.admin_type?.toString().toLowerCase() === "supervisor" ||
+      user?.admin_type?.toString().toLowerCase() === "superadmin" ||
+      user?.admintype?.toString().toLowerCase() === "supervisor" ||
+      user?.admintype?.toString().toLowerCase() === "superadmin";
+
     const buildNavItems = (permissionKeys, config) => {
       if (!permissionKeys) return [];
 
-      return permissionKeys
+      let keys = [...permissionKeys];
+
+      if (isSupervisor && !keys.includes("NOTIFICATION")) {
+        const settingsIndex = keys.indexOf("SETTINGS");
+        if (settingsIndex !== -1) {
+          keys.splice(settingsIndex, 0, "NOTIFICATION");
+        } else {
+          keys.push("NOTIFICATION");
+        }
+      }
+
+      return keys
         .map((key) => {
           if (key === "MASTER_SETTINGS_LIMITED") {
             return LIMITED_MASTER_SETTINGS;

@@ -94,6 +94,14 @@ export const CONTACT_API = {
   delete: (id) => `/panel-delete-contact/${id}`,
 };
 
+
+export const NOTIFICATION_API = {
+  fetch: "/panel-fetch-notification",
+  byId: (id) => `/panel-fetch-notification-by-id/${id}`,
+  create: "/panel-create-notification",
+  delete: (id) => `/panel-delete-notification/${id}`,
+};
+
 export const SHARE_USER_API = {
   list: "/panel-fetch-share-list",
   byId: (id) => `/panel-fetch-share-by-id/${id}`,
