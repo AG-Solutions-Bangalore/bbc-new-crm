@@ -266,7 +266,6 @@ const USER_ROLE_PERMISSIONS = {
       "CONTACT",
       "SHARE_USER",
       "REPORT",
-      "NOTIFICATION",
       "SETTINGS",
     ],
     navMainReport: [
@@ -284,7 +283,6 @@ const USER_ROLE_PERMISSIONS = {
       "CONTACT",
       "SHARE_USER",
       "REPORT",
-      "NOTIFICATION",
       "SETTINGS",
     ],
   },
@@ -398,27 +396,30 @@ const useNavigationData = (user) => {
     const permissions =
       USER_ROLE_PERMISSIONS[userTypeKey] || USER_ROLE_PERMISSIONS[1];
 
-    const isSupervisor =
-      Number(user?.user_type) === 2 ||
-      Number(user?.usertype) === 2 ||
-      userTypeKey === 2 ||
-      user?.admin_type?.toString().toLowerCase() === "supervisor" ||
+    const isUserType2 =
+      Number(user?.user_type) === 2 || Number(user?.usertype) === 2;
+    const isAdminTypeSupervisor =
       user?.admin_type?.toString().toLowerCase() === "superadmin" ||
-      user?.admintype?.toString().toLowerCase() === "supervisor" ||
       user?.admintype?.toString().toLowerCase() === "superadmin";
+
+    const showNotification = isUserType2 && isAdminTypeSupervisor;
 
     const buildNavItems = (permissionKeys, config) => {
       if (!permissionKeys) return [];
 
       let keys = [...permissionKeys];
 
-      if (isSupervisor && !keys.includes("NOTIFICATION")) {
-        const settingsIndex = keys.indexOf("SETTINGS");
-        if (settingsIndex !== -1) {
-          keys.splice(settingsIndex, 0, "NOTIFICATION");
-        } else {
-          keys.push("NOTIFICATION");
+      if (showNotification) {
+        if (!keys.includes("NOTIFICATION")) {
+          const settingsIndex = keys.indexOf("SETTINGS");
+          if (settingsIndex !== -1) {
+            keys.splice(settingsIndex, 0, "NOTIFICATION");
+          } else {
+            keys.push("NOTIFICATION");
+          }
         }
+      } else {
+        keys = keys.filter((key) => key !== "NOTIFICATION");
       }
 
       return keys
